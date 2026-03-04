@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Question 💖</title>
+    <style>
+        /* General Page Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; /* Prevent scrollbars when button moves */
+        }
+
+        /* The Popup Box */
+        .popup {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
+            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        h2 {
+            color: #5a3e54;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        /* Button Container */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative; /* Needed for absolute positioning of No button */
+            height: 60px; /* Reserve space */
+        }
+
+        /* Button Styling */
+        button {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+        }
+
+        #yesBtn {
+            background-color: #fff;
+            color: #ff6b81;
+            box-shadow: 0 4px 15px rgba(255, 107, 129, 0.3);
+        }
+
+        #yesBtn:hover {
+            transform: scale(1.05);
+            background-color: #ffe0e3;
+        }
+
+        #noBtn {
+            background-color: #fff;
+            color: #a4b0be;
+            position: absolute; /* Allows free movement */
+            left: 50%; /* Start centered */
+            transform: translateX(-50%);
+        }
+
+        /* Success Message (Hidden initially) */
+        #successMessage {
+            display: none;
+            text-align: center;
+            z-index: 20;
+        }
+
+        #successMessage h1 {
+            color: #ff6b81;
+            font-size: 3rem;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Floating Text (The "Nope" messages) */
+        .floating-text {
+            position: absolute;
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: bold;
+            pointer-events: none; /* Click through */
+            animation: floatUp 1s ease-out forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-30px); }
+        }
+
+        /* Falling Hearts Animation */
+        .heart {
+            position: absolute;
+            top: -10px;
+            color: #ff6b81;
+            font-size: 20px;
+            animation: fall linear forwards;
+            z-index: 5;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(105vh); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- The Main Popup -->
+    <div class="popup" id="mainPopup">
+        <h2>Will you be my girlfriend? 💖</h2>
+        <div class="btn-container">
+            <button id="yesBtn">Yes 💖</button>
+            <button id="noBtn">No 😅</button>
+        </div>
+    </div>
+
+    <!-- The Success Message -->
+    <div id="successMessage">
+        <h1>Yayyy! I knew it! 💕</h1>
+        <p>You just made me the happiest person alive!</p>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const popup = document.getElementById('mainPopup');
+        const successMsg = document.getElementById('successMessage');
+        const btnContainer = document.querySelector('.btn-container');
+
+        // Messages to show when hovering/clicking "No"
+        const noMessages = [
+            "Nope, not possible 😌",
+            "No can't escape 😏",
+            "Haha, nice try 😂",
+            "Try again! 🤪",
+            "Not a chance! 🙅‍♀️",
+            "Are you sure? 🤔"
+        ];
+
+        // Function to move the "No" button randomly
+        function moveButton() {
+            // Get viewport dimensions
+            const maxX = window.innerWidth - noBtn.offsetWidth;
+            const maxY = window.innerHeight - noBtn.offsetHeight;
+
+            // Generate random coordinates
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            // Apply new position
+            noBtn.style.position = 'fixed'; // Switch to fixed to move anywhere on screen
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+            noBtn.style.transform = 'none'; // Remove centering transform
+
+            // Show floating text
+            showFloatingText(randomX, randomY);
+        }
+
+        // Function to show floating text
+        function showFloatingText(x, y) {
+            const text = document.createElement('div');
+            text.classList.add('floating-text');
+            text.innerText = noMessages[Math.floor(Math.random() * noMessages.length)];
+            
+            // Position text near the button
+            text.style.left = (x + 20) + 'px';
+            text.style.top = (y - 20) + 'px';
+
+            document.body.appendChild(text);
+
+            // Remove element after animation finishes
+            setTimeout(() => {
+                text.remove();
+            }, 1000);
+        }
+
+        // Event Listeners for "No" button
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('click', moveButton); // In case they manage to click it
+
+        // Event Listener for "Yes" button
+        yesBtn.addEventListener('click', () => {
+            popup.style.display = 'none'; // Hide popup
+            successMsg.style.display = 'block'; // Show success message
+            startHeartRain(); // Start the confetti effect
+        });
+
+        // Function to create falling hearts
+        function startHeartRain() {
+            const heartCount = 50; // Number of hearts
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.innerHTML = '❤️';
+                
+                // Randomize position and speed
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = (Math.random() * 2 + 2) + 's'; // Between 2-4s
+                heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                
+                document.body.appendChild(heart);
+
+                // Clean up DOM
+                setTimeout(() => {
+                    heart.remove();
+                }, 4000);
+            }
+        }
+    </script>
+</body>
+</html>
