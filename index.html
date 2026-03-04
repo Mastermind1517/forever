@@ -2,22 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>A Special Question 💖</title>
     <style>
         /* General Page Styling */
         body {
             margin: 0;
             padding: 0;
-            height: 100vh;
+            height: 100dvh; /* FIXED for modern mobile browsers */
             display: flex;
             justify-content: center;
             align-items: center;
             background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; /* Prevent scrollbars when button moves */
+            overflow: hidden;
         }
-
         /* The Popup Box */
         .popup {
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
@@ -109,6 +108,7 @@
             pointer-events: none; /* Click through */
             animation: floatUp 1s ease-out forwards;
             white-space: nowrap;
+            z-index: 1000;
         }
 
         @keyframes floatUp {
@@ -129,13 +129,17 @@
         @keyframes fall {
             to { transform: translateY(105vh); }
         }
+
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
     </style>
 </head>
 <body>
 
     <!-- The Main Popup -->
     <div class="popup" id="mainPopup">
-        <h2>Will you be my girlfriend? 💖</h2>
+        <h2>Will you be my forever? 💖</h2>
         <div class="btn-container">
             <button id="yesBtn">Yes 💖</button>
             <button id="noBtn">No 😅</button>
@@ -153,84 +157,105 @@
         const yesBtn = document.getElementById('yesBtn');
         const popup = document.getElementById('mainPopup');
         const successMsg = document.getElementById('successMessage');
-        const btnContainer = document.querySelector('.btn-container');
 
-        // Messages to show when hovering/clicking "No"
         const noMessages = [
             "Nope, not possible 😌",
             "No can't escape 😏",
             "Haha, nice try 😂",
             "Try again! 🤪",
             "Not a chance! 🙅‍♀️",
-            "Are you sure? 🤔"
+            "Are you sure? 🤔",
+            "Mumma wants to run? 😥",
+            "How dare you? 🔪",
+            "Access denied 🚫",
+            "Permission rejected ❌",
+            "Plot twist! Nope 🎬",
+            "Mission failed 😜",
+            "That button is shy 🫣",
+            "Try harder, queen 👸",
+            "Almost… but still no 😌",
+            "Denied by the love committee 💕",
+            "Security says no 🔐",
+            "That was cute though 🥹",
+            "This button has trust issues 😭",
+            "Not today, my wifey🤭",
+            "Wrong choice detected 🚨",
+            "Nope, destiny says YES only ✨",
+            "Your finger missed again 👀",
+            "That’s illegal here 🚔",
+            "System overthinking: YES required 💖",
+            "Are you nervous? 😳",
+            "The universe refuses this ❌🌌",
+            "This is a YES-only zone 🚫❌",
+            "Denied with love 💌",
+            "That click was suspicious 🤨",
+            "Romance firewall activated 🔥",
+            "That option expired 😌",
+            "Keep trying, I’m entertained 🍿"
         ];
 
-        // Function to move the "No" button randomly
+        // Move button randomly (mobile + desktop safe)
         function moveButton() {
-            // Get viewport dimensions
-            const maxX = window.innerWidth - noBtn.offsetWidth;
-            const maxY = window.innerHeight - noBtn.offsetHeight;
 
-            // Generate random coordinates
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+
+            const maxX = window.innerWidth - btnWidth - 10;
+            const maxY = window.innerHeight - btnHeight - 10;
+
             const randomX = Math.floor(Math.random() * maxX);
             const randomY = Math.floor(Math.random() * maxY);
 
-            // Apply new position
-            noBtn.style.position = 'fixed'; // Switch to fixed to move anywhere on screen
+            noBtn.style.position = 'fixed';
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
-            noBtn.style.transform = 'none'; // Remove centering transform
+            noBtn.style.transform = 'none';
 
-            // Show floating text
             showFloatingText(randomX, randomY);
         }
 
-        // Function to show floating text
         function showFloatingText(x, y) {
             const text = document.createElement('div');
             text.classList.add('floating-text');
             text.innerText = noMessages[Math.floor(Math.random() * noMessages.length)];
-            
-            // Position text near the button
-            text.style.left = (x + 20) + 'px';
-            text.style.top = (y - 20) + 'px';
+
+            text.style.left = Math.min(x + 10, window.innerWidth - 150) + 'px';
+            text.style.top = Math.max(y - 20, 10) + 'px';
 
             document.body.appendChild(text);
 
-            // Remove element after animation finishes
             setTimeout(() => {
                 text.remove();
             }, 1000);
         }
 
-        // Event Listeners for "No" button
-        noBtn.addEventListener('mouseover', moveButton);
-        noBtn.addEventListener('click', moveButton); // In case they manage to click it
-
-        // Event Listener for "Yes" button
-        yesBtn.addEventListener('click', () => {
-            popup.style.display = 'none'; // Hide popup
-            successMsg.style.display = 'block'; // Show success message
-            startHeartRain(); // Start the confetti effect
+        // Universal pointer event (works on mobile + desktop)
+        noBtn.addEventListener('pointerdown', function(e) {
+            e.preventDefault();
+            moveButton();
         });
 
-        // Function to create falling hearts
+        // Yes button
+        yesBtn.addEventListener('pointerdown', function() {
+            popup.style.display = 'none';
+            successMsg.style.display = 'block';
+            startHeartRain();
+        });
+
         function startHeartRain() {
-            const heartCount = 50; // Number of hearts
-            
+            const heartCount = 50;
+
             for (let i = 0; i < heartCount; i++) {
                 const heart = document.createElement('div');
                 heart.classList.add('heart');
                 heart.innerHTML = '❤️';
-                
-                // Randomize position and speed
+
                 heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.animationDuration = (Math.random() * 2 + 2) + 's'; // Between 2-4s
+                heart.style.animationDuration = (Math.random() * 2 + 2) + 's';
                 heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
-                
+
                 document.body.appendChild(heart);
 
-                // Clean up DOM
                 setTimeout(() => {
                     heart.remove();
                 }, 4000);
